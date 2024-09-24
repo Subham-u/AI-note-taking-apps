@@ -39,11 +39,14 @@ export async function generateImage(imageDescription : string,name :string) {
 
     const buffer = await response.arrayBuffer();
     
-    const imagePath = path.join('./public/assets', `${name.replace(/\s+/g, '-').toLowerCase()}.png`);
+    const base64 = buffer.toString('base64');
+    const imglink=`data:image/png;base64,${base64}`
+    console.log("this is image link : ", imglink);
+    const imagePath = path.join('public/assets', `${name.replace(/\s+/g, '-').toLowerCase()}.png`);
 
     console.log('Image generated successfully!');
 
-    fs.writeFile(imagePath, Buffer.from(buffer), (err) => {
+    const check=fs.writeFile(imagePath, Buffer.from(buffer),(err) => {
       if (err) {
         console.error('Error saving image:', err);
       } else {
@@ -55,7 +58,8 @@ export async function generateImage(imageDescription : string,name :string) {
    if(!imageUrl){
     return null;
    }
-   return imageUrl.url as string
+  //  return imageUrl.url as string
+   return imglink as string
 
   } catch (error) {
     console.error('Error generating image:', error);
