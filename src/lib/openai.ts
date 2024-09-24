@@ -39,7 +39,7 @@ export async function generateImage(imageDescription : string,name :string) {
 
     const buffer = await response.arrayBuffer();
     
-    const imagePath = path.join('/Users/subhammahapatra/desktop', `${name.replace(/\s+/g, '-').toLowerCase()}.png`);
+    const imagePath = path.join('./public/assets', `${name.replace(/\s+/g, '-').toLowerCase()}.png`);
 
     console.log('Image generated successfully!');
 
