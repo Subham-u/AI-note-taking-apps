@@ -1,7 +1,5 @@
 // import { uploadFile } from "./firebase";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import fs from 'fs';
-import path from 'path';
 import { uploadOnCloudinary} from "./cloudinary";
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY as string;
@@ -35,26 +33,12 @@ export async function generateImage(imageDescription : string,name :string) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const buffer = await response.arrayBuffer();
-
-    const imagePath = path.join('public/assets', `${name.replace(/\s+/g, '-').toLowerCase()}.png`);
-
-    console.log('Image generated successfully!');
-
-    const check=fs.writeFile(imagePath, Buffer.from(buffer),(err) => {
-      if (err) {
-        console.error('Error saving image:', err);
-      } else {
-        console.log(`Image saved successfully to ${imagePath}`);
-      }
-    });
-    console.log("result after filewrite -> ",check);
-
-   const imageUrl = await uploadOnCloudinary(imagePath)
+   const buffer = await response.arrayBuffer();
+   console.log('Image generated successfully!');
+   const imageUrl = await uploadOnCloudinary(Buffer.from(buffer));
    if(!imageUrl){
     return null;
    }
-   console.log(imageUrl);
    return imageUrl.url as string
 
   } catch (error) {
