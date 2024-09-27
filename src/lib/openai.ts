@@ -2,21 +2,19 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import fs from 'fs';
 import path from 'path';
-import { uploadOnCloudinary } from "./cloudinary";
+import { uploadOnCloudinary} from "./cloudinary";
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY as string;
+const cloudinary = require('cloudinary').v2
+
 
 const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
 export async function generateImagePrompt(name: string) {
-  
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
   const prompt = `You are an creative and helpful AI assistance capable of generating interesting thumbnail descriptions for my notes. Your output will be fed into the GEMINI API to generate a thumbnail. The description should be minimalistic and flat styled. Please generate a thumbnail description for my notebook titles ${name}.`;
-
   const image_description = await model.generateContent(prompt);
   return image_description.response.text() as string;
 }
-
 export async function generateImage(imageDescription : string,name :string) {
   const form = new FormData()
   const prompt = `${imageDescription}`;
@@ -38,10 +36,7 @@ export async function generateImage(imageDescription : string,name :string) {
     }
 
     const buffer = await response.arrayBuffer();
-    
-    const base64 = buffer.toString('base64');
-    const imglink=`data:image/png;base64,${base64}`
-    console.log("this is image link : ", imglink);
+
     const imagePath = path.join('public/assets', `${name.replace(/\s+/g, '-').toLowerCase()}.png`);
 
     console.log('Image generated successfully!');
@@ -53,13 +48,14 @@ export async function generateImage(imageDescription : string,name :string) {
         console.log(`Image saved successfully to ${imagePath}`);
       }
     });
+    console.log("result after filewrite -> ",check);
 
    const imageUrl = await uploadOnCloudinary(imagePath)
    if(!imageUrl){
     return null;
    }
-  //  return imageUrl.url as string
-   return imglink as string
+   console.log(imageUrl);
+   return imageUrl.url as string
 
   } catch (error) {
     console.error('Error generating image:', error);
